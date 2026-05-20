@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug in MCP Gateway
+about: Report a bug in one-mcp
 title: ""
 labels: bug
 assignees: ""

@@ -1,6 +1,6 @@
-# Contributing to MCP Gateway
+# Contributing to one-mcp
 
-Thanks for your interest in MCP Gateway! This is a small but ambitious project —
+Thanks for your interest in one-mcp! This is a small but ambitious project —
 a single-point proxy that routes AI agent MCP tool calls to 10+ backend servers.
 We welcome contributions of all kinds: bug reports, feature requests, docs,
 tests, and code.
@@ -23,7 +23,7 @@ By participating, you agree to uphold its standards.
 
 ## What We're Building
 
-MCP Gateway sits between an AI agent and multiple backend MCP servers. The agent
+one-mcp sits between an AI agent and multiple backend MCP servers. The agent
 connects to one SSE endpoint, and the gateway routes each tool call to the right
 backend server. Key design goals:
 
@@ -43,8 +43,8 @@ backend server. Key design goals:
 ### Setup
 
 ```bash
-git clone https://github.com/samanvaya5/mcp-gateway.git
-cd mcp-gateway
+git clone https://github.com/samanvaya5/one-mcp.git
+cd one-mcp
 bun install
 bun test          # Run the test suite
 bun start         # Start the gateway on port 8000
@@ -66,7 +66,7 @@ bun dev    # Starts with --watch for automatic reload on file changes
 
 ### Adding a New Backend Server
 
-1. Add the server to your local config file (`~/.sisyphus/mcp-gateway-config.json`).
+1. Add the server to your local config file (`~/.sisyphus/one-mcp-config.json`).
 2. Verify it works: `curl http://localhost:8000/api/health`
 3. If the server uses static tool definitions, add them to the test fixtures.
 
@@ -79,7 +79,7 @@ manages server lifecycle, wire it through the proxy in `src/proxy.ts`.
 ## Project Structure
 
 ```
-mcp-gateway/
+one-mcp/
 ├── src/                  # Source code
 │   ├── index.ts          # Entry point — HTTP server, MCP handlers, API routes
 │   ├── config.ts         # Config loader (JSON + env var + cmd substitution)
@@ -168,5 +168,5 @@ bun test tests/proxy.test.ts  # Run a single test file
 
 ## Getting Help
 
-- Open a [GitHub issue](https://github.com/samanvaya5/mcp-gateway/issues)
+- Open a [GitHub issue](https://github.com/samanvaya5/one-mcp/issues)
 - For security issues, see [SECURITY.md](SECURITY.md)

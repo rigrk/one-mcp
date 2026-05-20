@@ -1,4 +1,4 @@
-// MCP Gateway — TypeScript type definitions
+// one-mcp — TypeScript type definitions
 
 export interface ServerConfig {
   name: string;

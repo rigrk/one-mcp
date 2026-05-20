@@ -1,5 +1,5 @@
 /**
- * e2e.test.ts — End-to-end integration tests for the MCP Gateway.
+ * e2e.test.ts — End-to-end integration tests for the one-mcp.
  *
  * These tests verify full user-facing scenarios across module boundaries:
  * cold start, tool discovery, on-demand spawning, tool proxying, idle kill,
@@ -132,7 +132,7 @@ function startTestApiServer(
 // Test Suite
 // ═══════════════════════════════════════════════════════════════
 
-describe("e2e: MCP Gateway full lifecycle", () => {
+describe("e2e: one-mcp full lifecycle", () => {
   // ── Test 1: Cold start ──────────────────────────────────────
   describe("1. COLD START", () => {
     test("health endpoint returns ok with zero running servers on startup", async () => {

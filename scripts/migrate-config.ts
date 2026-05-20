@@ -230,7 +230,7 @@ export interface MigrateOptions {
 async function discoverFromGatewayConfig(
   secrets: SecretEntry[],
 ): Promise<{ servers: ServerConfig[]; missingServers: string[] } | null> {
-  const gatewayConfigPath = join(homedir(), ".sisyphus", "mcp-gateway-config.json");
+  const gatewayConfigPath = join(homedir(), ".sisyphus", "one-mcp-config.json");
 
   try {
     const raw = await readFile(gatewayConfigPath, "utf-8");
@@ -370,7 +370,7 @@ export async function migrateConfig(options: MigrateOptions): Promise<GatewayCon
     port: 8000,
     host: "127.0.0.1",
     registryPath: "~/.sisyphus/tool-registry.json",
-    logPath: "~/.sisyphus/mcp-gateway/logs/gateway.log",
+    logPath: "~/.sisyphus/one-mcp/logs/gateway.log",
     servers,
   };
 
@@ -383,7 +383,7 @@ async function run(): Promise<void> {
     options: {
       "secrets-path": { type: "string", default: join(homedir(), ".sisyphus", "mcp-secrets.json") },
       "plist-dir": { type: "string", default: join(homedir(), "Library", "LaunchAgents") },
-      "output": { type: "string", default: join(homedir(), ".sisyphus", "mcp-gateway-config.json") },
+      "output": { type: "string", default: join(homedir(), ".sisyphus", "one-mcp-config.json") },
     },
     allowPositionals: false,
     strict: false,

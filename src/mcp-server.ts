@@ -83,9 +83,9 @@ export async function createGatewayServer(
 ): Promise<{ server: McpServer; httpServer: HttpServer }> {
   const mcpServer = new McpServer(
     {
-      name: "mcp-gateway",
+      name: "one-mcp",
       version: "1.0.0",
-      description: "MCP Gateway — orchestrates backend MCP servers for web search, GitHub, Firebase, browser automation, SSH, YouTube analysis, and more. Browse servers with list_servers(), explore tools with browse_server(), search tools with search_tools().",
+      description: "one-mcp — orchestrates backend MCP servers for web search, GitHub, Firebase, browser automation, SSH, YouTube analysis, and more. Browse servers with list_servers(), explore tools with browse_server(), search tools with search_tools().",
     },
     { capabilities: { tools: {} } },
   );
@@ -184,9 +184,9 @@ export async function createGatewayServer(
 export async function createStdioGatewayServer(): Promise<McpServer> {
   const mcpServer = new McpServer(
     {
-      name: "mcp-gateway",
+      name: "one-mcp",
       version: "1.0.0",
-      description: "MCP Gateway — orchestrates backend MCP servers for web search, GitHub, Firebase, browser automation, SSH, YouTube analysis, and more. Browse servers with list_servers(), explore tools with browse_server(), search tools with search_tools().",
+      description: "one-mcp — orchestrates backend MCP servers for web search, GitHub, Firebase, browser automation, SSH, YouTube analysis, and more. Browse servers with list_servers(), explore tools with browse_server(), search tools with search_tools().",
     },
     { capabilities: { tools: {} } },
   );

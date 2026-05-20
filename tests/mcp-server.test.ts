@@ -108,7 +108,7 @@ describe("MCP Server", () => {
       }),
     });
     const body = await res.json();
-    expect(body.result.serverInfo.name).toBe("mcp-gateway");
+    expect(body.result.serverInfo.name).toBe("one-mcp");
     expect(body.result.serverInfo.version).toBe("1.0.0");
   });
 

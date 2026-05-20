@@ -10,11 +10,11 @@ const REQUIRED_TOP_FIELDS = ["port", "host", "registryPath", "logPath", "servers
 const config = await migrateConfig({
   secretsPath: join(homedir(), ".sisyphus", "mcp-secrets.json"),
   plistDir: join(homedir(), "Library", "LaunchAgents"),
-  output: join(homedir(), ".sisyphus", "mcp-gateway-config.json"),
+  output: join(homedir(), ".sisyphus", "one-mcp-config.json"),
 });
 
 // Some tests require all 13 servers to be present in the local environment
-// (either via ~/.sisyphus/mcp-gateway-config.json or plist files). They are
+// (either via ~/.sisyphus/one-mcp-config.json or plist files). They are
 // skipped automatically in environments that don't have the full setup.
 const fullEnv = test.skipIf(config.servers.length < 13);
 
@@ -33,7 +33,7 @@ describe("migrate-config", () => {
     expect(config.port).toBe(8000);
     expect(config.host).toBe("127.0.0.1");
     expect(config.registryPath).toBe("~/.sisyphus/tool-registry.json");
-    expect(config.logPath).toBe("~/.sisyphus/mcp-gateway/logs/gateway.log");
+    expect(config.logPath).toBe("~/.sisyphus/one-mcp/logs/gateway.log");
   });
 
   test("persistent servers have mode persistent and idleTimeout 600", () => {

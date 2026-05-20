@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 const configPath =
   process.env.MCP_GATEWAY_CONFIG ||
-  join(process.env.HOME || "", ".sisyphus/mcp-gateway-config.json");
+  join(process.env.HOME || "", ".sisyphus/one-mcp-config.json");
 
 async function main() {
   // 1. Load and validate config
@@ -31,7 +31,7 @@ async function main() {
   console.log(`🔌 Local Port: ${port} (Randomly selected)`);
 
   // 3. Start Gateway in background
-  console.log("\nStarting MCP Gateway...");
+  console.log("\nStarting one-mcp...");
   const gateway = spawn("bun", ["run", "src/index.ts"], {
     stdio: "inherit",
     env: { ...process.env, MCP_GATEWAY_CONFIG: configPath, PORT: port.toString() },

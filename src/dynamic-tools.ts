@@ -1,5 +1,5 @@
 /**
- * Dynamic Tool Registry — runtime tool creation for the MCP Gateway.
+ * Dynamic Tool Registry — runtime tool creation for one-mcp.
  *
  * Agents can create reusable shell-template tools on the fly via the
  * `create_tool` gateway tool.  Created tools are stored in-memory and

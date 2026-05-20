@@ -1,7 +1,7 @@
-# MCP Gateway
+# one-mcp
 
-[![CI](https://github.com/samanvaya5/mcp-gateway/actions/workflows/ci.yml/badge.svg)](https://github.com/samanvaya5/mcp-gateway/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/mcp-gateway?color=blue)](https://www.npmjs.com/package/mcp-gateway)
+[![CI](https://github.com/samanvaya5/one-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/samanvaya5/one-mcp/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/one-mcp?color=blue)](https://www.npmjs.com/package/one-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Bun](https://img.shields.io/badge/Bun-≥1.0-black?logo=bun)](https://bun.sh)
 
@@ -13,8 +13,8 @@ gateway and get unified tool discovery, on-demand lifecycle, crash recovery,
 and config hot-reload — all behind a single port.
 
 ```bash
-npm install -g mcp-gateway
-mcp-gateway
+npm install -g one-mcp
+one-mcp
 # Agent connects to http://localhost:8000/sse
 ```
 
@@ -40,12 +40,12 @@ mcp-gateway
 
 ```bash
 # Using npm (recommended)
-npm install -g mcp-gateway
-mcp-gateway
+npm install -g one-mcp
+one-mcp
 
 # Or from source
-git clone https://github.com/samanvaya5/mcp-gateway.git
-cd mcp-gateway && bun install
+git clone https://github.com/samanvaya5/one-mcp.git
+cd one-mcp && bun install
 bun start
 ```
 
@@ -56,7 +56,7 @@ Add this to your agent's MCP configuration:
 ```json
 {
   "mcpServers": {
-    "mcp-gateway": {
+    "one-mcp": {
       "type": "sse",
       "url": "http://localhost:8000/sse"
     }
@@ -71,7 +71,7 @@ That's it. The agent now has access to every backend server behind the gateway.
 ```
 ┌─────────────┐     /sse (SSE)     ┌─────────────────────────────┐
 │             │ ──────────────────→ │                             │
-│  AI Agent   │                    │       MCP Gateway            │
+│  AI Agent   │                    │       one-mcp            │
 │  (Claude,   │ ←────────────────── │  ┌───────────────────────┐  │
 │   Grok...)  │   tools/list,       │  │   12 Native Tools     │  │
 │             │   tools/call        │  │  (search, describe,   │  │
@@ -111,7 +111,7 @@ the call. Results flow back through the same connection.
 ## Configuration
 
 The gateway reads from `MCP_GATEWAY_CONFIG` (defaults to
-`~/.sisyphus/mcp-gateway-config.json`):
+`~/.sisyphus/one-mcp-config.json`):
 
 ```json
 {

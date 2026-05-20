@@ -18,7 +18,7 @@ import { relative } from "node:path";
 
 const HOME = homedir();
 const GATEWAY_URL = "http://localhost:8000/sse";
-const GATEWAY_KEY = "mcp-gateway";
+const GATEWAY_KEY = "one-mcp";
 const OLD_KEY = "antigravity";
 
 const GATEWAY_ENTRY = {
@@ -356,7 +356,7 @@ async function dryRun(): Promise<void> {
 }
 
 async function migrate(): Promise<void> {
-  console.log(c.bold("\n═══ Migrating All 15 Agent Configs to MCP Gateway ═══\n"));
+  console.log(c.bold("\n═══ Migrating All 15 Agent Configs to one-mcp ═══\n"));
 
   const results: MigrationResult[] = [];
   for (const entry of CONFIG_FILES) {

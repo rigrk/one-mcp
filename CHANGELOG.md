@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to MCP Gateway are documented here.
+All notable changes to one-mcp (formerly MCP Gateway) are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -73,7 +73,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] — 2026-05-19
 
 ### Added
-- Initial public release of MCP Gateway
+- Initial public release as MCP Gateway
+- Renamed to `one-mcp` in v1.1.0
 - Single-point SSE proxy for 10+ MCP backend servers
 - On-demand server spawning with configurable idle timeout
 - Persistent server mode for always-on servers

@@ -2,7 +2,7 @@
   "port": 8000,
   "host": "127.0.0.1",
   "registryPath": "~/.sisyphus/tool-registry.json",
-  "logPath": "~/.sisyphus/mcp-gateway/logs/gateway.log",
+  "logPath": "~/.sisyphus/one-mcp/logs/gateway.log",
   "servers": [
     {
       "name": "github",

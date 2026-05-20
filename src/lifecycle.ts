@@ -57,7 +57,7 @@ export class LifecycleManager {
       });
 
       const client = new Client(
-        { name: "mcp-gateway", version: "0.1.0" },
+        { name: "one-mcp", version: "0.1.0" },
         { capabilities: {} },
       );
 

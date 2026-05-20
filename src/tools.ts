@@ -294,12 +294,12 @@ export function handleListServers(
   // Prepend the gateway itself as a virtual server
   const gatewayTools = getGatewayToolDefs();
   servers.unshift({
-    name: "mcp-gateway",
+    name: "one-mcp",
     mode: "persistent",
     status: "running",
     idleTimeout: 0,
     disabled: false,
-    description: "MCP Gateway — orchestrates backend MCP servers for web search, GitHub, Firebase, browser automation, SSH, YouTube analysis, and more",
+    description: "one-mcp — orchestrates backend MCP servers for web search, GitHub, Firebase, browser automation, SSH, YouTube analysis, and more",
     toolCount: gatewayTools.length,
     sampleTools: gatewayTools.map((t) => t.name),
   });
@@ -488,13 +488,13 @@ export function handleBrowseServer(
   healthTracker: HealthTracker,
 ): BrowseServerResult {
   // Handle the gateway itself as a virtual server
-  if (serverName === "mcp-gateway") {
+  if (serverName === "one-mcp") {
     const gatewayTools = getGatewayToolDefs();
     return {
       server: {
-        name: "mcp-gateway",
-        serverProvidedName: "mcp-gateway",
-        description: "MCP Gateway — orchestrates backend MCP servers for web search, GitHub, Firebase, browser automation, SSH, YouTube analysis, and more",
+        name: "one-mcp",
+        serverProvidedName: "one-mcp",
+        description: "one-mcp — orchestrates backend MCP servers for web search, GitHub, Firebase, browser automation, SSH, YouTube analysis, and more",
         toolCount: gatewayTools.length,
       },
       toolGroups: [{

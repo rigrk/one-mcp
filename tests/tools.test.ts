@@ -41,8 +41,8 @@ function makeGatewayConfig(servers: ServerConfig[]): GatewayConfig {
     port: 8000,
     host: "127.0.0.1",
     servers,
-    registryPath: "/tmp/mcp-gateway/registry.json",
-    logPath: "/tmp/mcp-gateway.log",
+    registryPath: "/tmp/one-mcp/registry.json",
+    logPath: "/tmp/one-mcp.log",
   };
 }
 
@@ -177,7 +177,7 @@ describe("handleListServers", () => {
     const result = handleListServers(config, lifecycle, healthTracker, registry);
 
     // First entry is always the gateway itself
-    expect(result.servers[0]!.name).toBe("mcp-gateway");
+    expect(result.servers[0]!.name).toBe("one-mcp");
     expect(result.servers[0]!.toolCount).toBeGreaterThan(0);
 
     expect(result.servers[1]!.name).toBe("web");
@@ -217,7 +217,7 @@ describe("handleListServers", () => {
     const result = handleListServers(config, lifecycle, healthTracker, registry);
 
     expect(result.servers).toHaveLength(5);
-    expect(result.servers[0]!.name).toBe("mcp-gateway");
+    expect(result.servers[0]!.name).toBe("one-mcp");
 
     const running = result.servers.find((s) => s.name === "running-srv")!;
     expect(running.status).toBe("running");

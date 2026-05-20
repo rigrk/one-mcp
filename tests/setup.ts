@@ -1,4 +1,4 @@
-// Test utilities for MCP Gateway tests
+// Test utilities for one-mcp tests
 
 /**
  * Creates a mock child process spawner for testing process management.

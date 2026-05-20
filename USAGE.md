@@ -1,4 +1,4 @@
-# MCP Gateway — Usage Guide
+# one-mcp — Usage Guide
 
 ## Quick Start (3-Step Workflow)
 

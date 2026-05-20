@@ -33,7 +33,7 @@ function makeGatewayConfig(
     host: "127.0.0.1",
     servers,
     registryPath: REGISTRY_PATH,
-    logPath: "/tmp/mcp-gateway.log",
+    logPath: "/tmp/one-mcp.log",
   };
 }
 

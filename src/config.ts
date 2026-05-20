@@ -33,7 +33,7 @@ export const DEFAULT_CONFIG = {
   port: 8000,
   host: "127.0.0.1",
   idleTimeout: 300,
-  logPath: "/tmp/mcp-gateway.log",
+  logPath: "/tmp/one-mcp.log",
 };
 
 function resolveEnvValue(

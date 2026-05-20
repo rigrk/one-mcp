@@ -14,7 +14,7 @@ import { join } from "node:path";
 
 const configPath =
   process.env.MCP_GATEWAY_CONFIG ||
-  join(homedir(), ".config", "mcp-gateway", "config.json");
+  join(homedir(), ".config", "one-mcp", "config.json");
 
 const watch = process.argv.includes("--watch");
 const refreshRegistry = process.argv.includes("--refresh-registry");

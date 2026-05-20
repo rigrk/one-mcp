@@ -1,4 +1,4 @@
-// MCP Gateway — REST API routes (Node.js built-in http module only)
+// one-mcp — REST API routes (Node.js built-in http module only)
 import { EventEmitter } from "node:events";
 import type {
   Server as HttpServer,
