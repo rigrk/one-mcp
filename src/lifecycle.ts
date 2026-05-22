@@ -10,6 +10,7 @@ interface ServerEntry {
   startedAt: number;
   lastActivity: number;
   mode: "persistent" | "on-demand";
+  idleTimeout: number; // seconds; stored so the idle-check interval can kill without the original config
   serverInfo?: { name: string; version: string; description?: string };
   instructions?: string;
 }
@@ -72,6 +73,7 @@ export class LifecycleManager {
         startedAt: Date.now(),
         lastActivity: Date.now(),
         mode: config.mode,
+        idleTimeout: config.idleTimeout,
         serverInfo,
         instructions,
       };
@@ -115,13 +117,12 @@ export class LifecycleManager {
     }
   }
 
-  killIfIdle(name: string, config: ServerConfig): void {
-    if (config.mode === "persistent") return;
-
+  killIfIdle(name: string): void {
     const entry = this.servers.get(name);
     if (!entry) return;
+    if (entry.mode === "persistent") return;
 
-    const idleTimeoutMs = config.idleTimeout * 1000;
+    const idleTimeoutMs = entry.idleTimeout * 1000;
     if (Date.now() - entry.lastActivity < idleTimeoutMs) return;
 
     this.kill(name).catch(() => {});
@@ -153,8 +154,9 @@ export class LifecycleManager {
     if (this.idleTimer !== null) return;
 
     this.idleTimer = setInterval(() => {
-      for (const [, entry] of this.servers) {
+      for (const [name, entry] of this.servers) {
         if (entry.mode === "persistent") continue;
+        this.killIfIdle(name);
       }
     }, IDLE_CHECK_INTERVAL_MS);
 
