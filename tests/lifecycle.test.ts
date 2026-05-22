@@ -114,9 +114,9 @@ describe("LifecycleManager", () => {
     await lm.spawn("idle-srv", config, lock);
 
     const entry = lm.get("idle-srv")!;
-    (entry as Record<string, unknown>).lastActivity = Date.now() - 5000;
+    (entry as unknown as Record<string, unknown>).lastActivity = Date.now() - 5000;
 
-    lm.killIfIdle("idle-srv", config);
+    lm.killIfIdle("idle-srv");
 
     await new Promise((r) => setTimeout(r, 100));
 
@@ -178,7 +178,7 @@ describe("LifecycleManager", () => {
     const config = makeConfig({ name: "non-idle-srv", idleTimeout: 3600 });
     await lm.spawn("non-idle-srv", config, lock);
 
-    lm.killIfIdle("non-idle-srv", config);
+    lm.killIfIdle("non-idle-srv");
     await new Promise((r) => setTimeout(r, 50));
 
     expect(lm.get("non-idle-srv")).toBeDefined();
@@ -212,9 +212,9 @@ describe("LifecycleManager", () => {
     await lm.spawn("persistent-srv", config, lock);
 
     const entry = lm.get("persistent-srv")!;
-    (entry as Record<string, unknown>).lastActivity = Date.now() - 5000;
+    (entry as unknown as Record<string, unknown>).lastActivity = Date.now() - 5000;
 
-    lm.killIfIdle("persistent-srv", config);
+    lm.killIfIdle("persistent-srv");
     await new Promise((r) => setTimeout(r, 50));
 
     expect(lm.get("persistent-srv")).toBeDefined();
