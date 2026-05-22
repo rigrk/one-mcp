@@ -1,15 +1,21 @@
 {
   "name": "one-mcp",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Single-point proxy for Model Context Protocol servers — routes agent MCP calls to 10+ backend MCP servers with on-demand spawning, health tracking, and hot-reload config.",
-  "main": "src/index.ts",
-  "module": "src/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "type": "module",
   "bin": {
-    "one-mcp": "./src/index.ts"
+    "one-mcp": "./dist/index.js"
   },
   "files": [
-    "src/",
+    "dist/",
     "scripts/",
     "config/",
     "README.md",
@@ -17,11 +23,14 @@
     "LICENSE"
   ],
   "engines": {
-    "bun": ">=1.0"
+    "bun": ">=1.0",
+    "node": ">=18.0.0"
   },
   "scripts": {
     "start": "bun run src/index.ts",
     "dev": "bun run --watch src/index.ts",
+    "build": "bun build --target=bun --outdir=dist src/index.ts",
+    "prepublishOnly": "bun run build",
     "test": "bun test",
     "expose": "bun run scripts/expose.ts",
     "expose:open": "bun run scripts/expose-open.ts"
@@ -36,16 +45,25 @@
     "model-context-protocol",
     "gateway",
     "proxy",
-    "bun"
+    "router",
+    "ai",
+    "llm",
+    "agent",
+    "tools",
+    "sse",
+    "stdio",
+    "claude",
+    "anthropic"
   ],
   "author": "Samanvaya Yagsen",
   "license": "MIT",
+  "preferGlobal": true,
   "devDependencies": {
     "@types/bun": "latest",
     "@types/node": "^25.6.0"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@cfworker/json-schema": "^4.1.1",
