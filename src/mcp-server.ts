@@ -5,7 +5,11 @@ import {
 } from "@modelcontextprotocol/server";
 import { createServer } from "node:http";
 import type { IncomingMessage, ServerResponse, Server as HttpServer } from "node:http";
+import { createRequire } from "node:module";
 import type { GatewayConfig } from "./types.js";
+
+const require = createRequire(import.meta.url);
+const pkg = require("../package.json");
 
 async function readIncomingBody(req: IncomingMessage): Promise<Uint8Array | null> {
   if (req.method === "GET" || req.method === "HEAD") {
@@ -84,7 +88,7 @@ export async function createGatewayServer(
   const mcpServer = new McpServer(
     {
       name: "one-mcp",
-      version: "1.0.0",
+      version: pkg.version,
       description: "one-mcp — orchestrates backend MCP servers for web search, GitHub, Firebase, browser automation, SSH, YouTube analysis, and more. Browse servers with list_servers(), explore tools with browse_server(), search tools with search_tools().",
     },
     { capabilities: { tools: {} } },
@@ -185,7 +189,7 @@ export async function createStdioGatewayServer(): Promise<McpServer> {
   const mcpServer = new McpServer(
     {
       name: "one-mcp",
-      version: "1.0.0",
+      version: pkg.version,
       description: "one-mcp — orchestrates backend MCP servers for web search, GitHub, Firebase, browser automation, SSH, YouTube analysis, and more. Browse servers with list_servers(), explore tools with browse_server(), search tools with search_tools().",
     },
     { capabilities: { tools: {} } },
