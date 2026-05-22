@@ -53,3 +53,4 @@ test-exa.ts
 mock-mcp-server.js
 debug.log
 
+package-lock.json
