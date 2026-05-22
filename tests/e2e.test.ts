@@ -346,9 +346,9 @@ describe("e2e: one-mcp full lifecycle", () => {
       expect(lm.listRunning()).toContain("idle-srv");
 
       const entry = lm.get("idle-srv")!;
-      (entry as Record<string, unknown>).lastActivity = Date.now() - 5000;
+      (entry as unknown as Record<string, unknown>).lastActivity = Date.now() - 5000;
 
-      lm.killIfIdle("idle-srv", config);
+      lm.killIfIdle("idle-srv");
       await delay(100);
 
       expect(lm.get("idle-srv")).toBeUndefined();
@@ -366,9 +366,9 @@ describe("e2e: one-mcp full lifecycle", () => {
       expect(lm.listRunning()).toContain("persistent-srv");
 
       const entry = lm.get("persistent-srv")!;
-      (entry as Record<string, unknown>).lastActivity = Date.now() - 5000;
+      (entry as unknown as Record<string, unknown>).lastActivity = Date.now() - 5000;
 
-      lm.killIfIdle("persistent-srv", config);
+      lm.killIfIdle("persistent-srv");
       await delay(50);
 
       expect(lm.get("persistent-srv")).toBeDefined();
