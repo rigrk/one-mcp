@@ -13,10 +13,94 @@ gateway and get unified tool discovery, on-demand lifecycle, crash recovery,
 and config hot-reload — all behind a single port.
 
 ```bash
-npm install -g one-mcp
-one-mcp
-# Agent connects to http://localhost:8000/sse
+npm install -g one-mcp && one-mcp
+# Agent connects to → http://localhost:8000/sse
 ```
+
+---
+
+## What Is This?
+
+**one-mcp** is a gateway that sits between your AI agent and any number of MCP
+servers. Instead of configuring each agent with 10+ server endpoints, you
+connect it once to the gateway. The gateway handles routing, spawning,
+health monitoring, and tool discovery — so your agent sees one unified
+toolbox instead of a scattered mess of URLs.
+
+## Quick Start
+
+```bash
+# 1. Install (pick one)
+npm install -g one-mcp        # Node.js ≥18
+bun install -g one-mcp        # Bun ≥1.0 (recommended)
+
+# 2. Run
+one-mcp                       # Starts on http://localhost:8000
+
+# 3. Connect your agent to http://localhost:8000/sse
+```
+
+> **First run** auto-creates `~/.config/one-mcp/config.json`. Edit it to add
+> your backend servers, then restart. See [Configuration](#configuration).
+
+## Agent Quick Install
+
+### Claude Desktop
+
+Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "one-mcp": {
+      "command": "one-mcp",
+      "args": ["--stdio"]
+    }
+  }
+}
+```
+
+### Cursor
+
+Settings → MCP → Add server:
+- **Name:** `one-mcp`
+- **Type:** `command`
+- **Command:** `one-mcp --stdio`
+
+### Grok (Cloud / SSE)
+
+```bash
+bun run expose   # Prints public URL + auth token
+```
+
+Settings → MCP Servers → Add Server:
+- **Type:** `SSE`
+- **URL:** the public URL ending in `/sse`
+- **Headers:** `{"Authorization": "Bearer YOUR_TOKEN"}`
+
+### Generic SSE Agent
+
+```json
+{
+  "mcpServers": {
+    "one-mcp": {
+      "type": "sse",
+      "url": "http://localhost:8000/sse"
+    }
+  }
+}
+```
+
+## Why one-mcp?
+
+| Before | After |
+|--------|-------|
+| Configure 10+ MCP URLs in every agent | One SSE endpoint for all agents |
+| Servers running 24/7 eating memory | On-demand spawn, idle kill |
+| Manual restart when a server crashes | Auto crash recovery with backoff |
+| Edit config → restart agent → repeat | Config hot-reload, zero downtime |
+| Each agent has its own tool view | Unified namespace + BM25 search |
+| No runtime tool creation | Create shell tools on the fly |
 
 ## Features
 
@@ -31,92 +115,78 @@ one-mcp
 - **Auth** — Optional Bearer token via `MCP_GATEWAY_TOKEN` env var
 - **Config hot-reload** — `chokidar` watches your config file, applies diffs live
 - **Dynamic tools** — Create reusable shell tools at runtime with `${param}` templates
-- **ngrok expose** — `bun run expose` generates a public URL + auth token for Grok/cloud agents
+- **ngrok expose** — `bun run expose` generates a public URL + auth token for cloud agents
 - **3-step workflow** — Discover → Describe → Execute (inspired by how agents actually think)
 
-## Quick Start
+## Architecture
 
-### Install & Run
+```
+Agent (Claude/Grok/Cursor) → http://localhost:8000/sse
+                                    |
+                              ┌─────▼─────┐
+                              │  one-mcp  │
+                              │  Gateway  │
+                              │           │
+                              │ 12 Native │
+                              │  Tools    │
+                              │           │
+                              │  BM25     │
+                              │  Search   │
+                              │  Registry │
+                              │           │
+                              │  Lifecycle│
+                              │  Manager  │
+                              └─────┬─────┘
+                                    |
+                    ┌───────────────┼───────────────┐
+                    |               |               |
+               ┌────▼────┐    ┌────▼────┐    ┌────▼────┐
+               │  GitHub │    │  Exa2   │    │Playwright│
+               │  MCP    │    │ Search  │    │ Browser  │
+               └─────────┘    └─────────┘    └─────────┘
+               (on-demand)   (on-demand)    (persistent)
+```
+
+The gateway exposes a single SSE endpoint at `/sse`. When an agent calls a tool,
+the proxy extracts the server prefix from the namespaced tool name
+(e.g. `github__search_repositories`), spawns the backend server if needed, and
+routes the call. Results flow back through the same connection.
+
+## Installation
 
 ```bash
-# Using npm (recommended)
+# npm (Node.js ≥18)
 npm install -g one-mcp
-one-mcp
 
-# Or from source
+# Bun (recommended, ≥1.0)
+bun install -g one-mcp
+
+# From source
 git clone https://github.com/samanvaya5/one-mcp.git
 cd one-mcp && bun install
 bun start
 ```
 
-### Connect an Agent
+## Running
 
-Add this to your agent's MCP configuration:
-
-```json
-{
-  "mcpServers": {
-    "one-mcp": {
-      "type": "sse",
-      "url": "http://localhost:8000/sse"
-    }
-  }
-}
+```bash
+one-mcp                       # Start gateway
+one-mcp --watch               # Config hot-reload enabled
+one-mcp --refresh-registry    # Refresh tool cache on startup
+one-mcp --stdio               # Stdio mode (for clients without SSE)
 ```
-
-That's it. The agent now has access to every backend server behind the gateway.
-
-## How It Works
-
-```
-┌─────────────┐     /sse (SSE)     ┌─────────────────────────────┐
-│             │ ──────────────────→ │                             │
-│  AI Agent   │                    │       one-mcp            │
-│  (Claude,   │ ←────────────────── │  ┌───────────────────────┐  │
-│   Grok...)  │   tools/list,       │  │   12 Native Tools     │  │
-│             │   tools/call        │  │  (search, describe,   │  │
-└─────────────┘                     │  │   execute, manage...)  │  │
-                                    │  └───────────────────────┘  │
-                                    │           │                 │
-                                    │     ┌─────┴──────┐          │
-                                    │     │  Proxy +   │          │
-                                    │     │  Registry  │          │
-                                    │     │  (BM25,    │          │
-                                    │     │   caching) │          │
-                                    │     └─────┬──────┘          │
-                                    │           │                 │
-                                    │     ┌─────┴──────────────┐  │
-                                    │     │  Lifecycle Manager  │  │
-                                    │     │  (spawn, kill,     │  │
-                                    │     │   health, recovery) │  │
-                                    │     └─────┬──────────────┘  │
-                                    └────────────┼────────────────┘
-                                                 │
-                    ┌────────────────────────────┼────────────────────┐
-                    │                            │                    │
-               ┌────▼────┐                ┌──────▼──────┐     ┌─────▼─────┐
-               │ GitHub  │                │    Exa2     │     │ Playwright│
-               │ MCP Srv │                │  Web Search │     │  MCP Srv  │
-               └─────────┘                └─────────────┘     └───────────┘
-                    │                            │                    │
-              (spawns on                    (spawns on           (spawns on
-               demand)                       demand)              startup)
-```
-
-The gateway connects to a single SSE endpoint (`/sse`). When an agent calls a
-tool, the proxy extracts the server prefix from the namespaced tool name
-(e.g., `github__search_repositories`), spawns the backend if needed, and routes
-the call. Results flow back through the same connection.
 
 ## Configuration
 
-The gateway reads from `MCP_GATEWAY_CONFIG` (defaults to
-`~/.sisyphus/one-mcp-config.json`):
+On first run, the gateway auto-creates a default config at
+`~/.config/one-mcp/config.json`:
 
 ```json
 {
   "port": 8000,
   "host": "127.0.0.1",
+  "registryPath": "~/.config/one-mcp/tool-registry.json",
+  "logPath": "~/.config/one-mcp/gateway.log",
   "servers": [
     {
       "name": "github",
@@ -142,52 +212,63 @@ The gateway reads from `MCP_GATEWAY_CONFIG` (defaults to
 
 | Variable | Effect |
 |----------|--------|
-| `MCP_GATEWAY_CONFIG` | Path to config file |
-| `MCP_GATEWAY_TOKEN` | Enable Bearer auth (all endpoints except `/api/health`) |
-| `MCP_GATEWAY_NO_AUTH` | Set to `true` to disable auth even if token is set |
+| `MCP_GATEWAY_CONFIG` | Path to config file (default: `~/.config/one-mcp/config.json`) |
+| `MCP_GATEWAY_TOKEN` | Enable Bearer auth on all endpoints |
+| `MCP_GATEWAY_NO_AUTH` | Set to `true` to disable auth |
 | `PORT` | Override config port |
 | `HOST` | Override config host |
 
-## Using the Gateway (3-Step Workflow)
+## Agent Setup
 
-The gateway's native tools follow a **discover → understand → execute** workflow
-designed for how AI agents think:
+### Claude Desktop (Claude for Desktop)
 
-### Step 1: Discover
-
-```json
-{
-  "name": "search_tools",
-  "arguments": { "query": "github repository" }
-}
-```
-
-Returns namespaced tool names like `github__search_repositories`.
-
-### Step 2: Describe
+Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
-  "name": "describe_tool",
-  "arguments": { "tool": "github__search_repositories" }
-}
-```
-
-Returns full schema, description, and auto-generated usage examples.
-
-### Step 3: Execute
-
-```json
-{
-  "name": "execute_tool",
-  "arguments": {
-    "tool": "github__search_repositories",
-    "args": { "query": "machine learning stars:>1000", "perPage": 10 }
+  "mcpServers": {
+    "one-mcp": {
+      "command": "one-mcp",
+      "args": ["--stdio"]
+    }
   }
 }
 ```
 
-### All 12 Gateway-Native Tools
+### Cursor
+
+Settings → MCP → Add server:
+- **Name:** `one-mcp`
+- **Type:** `command`
+- **Command:** `one-mcp --stdio`
+
+### Grok (or any SSE-compatible agent)
+
+```bash
+# Start with ngrok tunnel
+bun run expose
+# Copy the public URL and token
+```
+
+Settings → MCP Servers → Add Server:
+- **Type:** `SSE`
+- **URL:** the public URL ending in `/sse`
+- **Headers:** `{"Authorization": "Bearer YOUR_TOKEN"}`
+
+### Generic SSE Agent
+
+```json
+{
+  "mcpServers": {
+    "one-mcp": {
+      "type": "sse",
+      "url": "http://localhost:8000/sse"
+    }
+  }
+}
+```
+
+## 12 Gateway-Native Tools
 
 | Tool | Purpose | When to Reach For It |
 |------|---------|---------------------|
@@ -204,49 +285,30 @@ Returns full schema, description, and auto-generated usage examples.
 | `register_server` | Add a new backend server at runtime | Dynamic config |
 | `unregister_server` | Remove a backend server | Cleanup |
 
-## Exposing to Cloud Agents (Grok, etc.)
-
-```bash
-# Secure mode — generates random token + ngrok URL
-bun run expose
-
-# Open mode — no auth (trusted networks only)
-bun run expose:open
-```
-
-The script prints a public URL and token. In Grok (or any SSE-compatible agent):
-
-1. Settings → MCP Servers → Add Server
-2. Type: **SSE**, URL: the public URL ending in `/sse`
-3. Headers: `{"Authorization": "Bearer YOUR_TOKEN"}`
-
-## Architecture
+## 3-Step Workflow
 
 ```
-src/
-├── index.ts           Entry point — HTTP server, MCP handlers, API routes
-├── config.ts          Config loader (JSON + ${VAR} + ${cmd:...} substitution)
-├── types.ts           Shared TypeScript interfaces
-├── mcp-server.ts      MCP protocol server (McpServer + SSE transport)
-├── proxy.ts           MCP proxy — tools/list, tools/call with namespace routing
-├── tools.ts           12 gateway-native tool definitions and dispatch
-├── api.ts             REST API routes (/api/health, /api/servers, etc.)
-├── lifecycle.ts       Server lifecycle — spawn, kill, idle tracking
-├── registry.ts        Disk-cached tool catalog (BM25 search, SHA-256 versioning)
-├── bm25.ts            BM25 full-text search tokenizer and ranker
-├── dynamic-tools.ts   Runtime shell tool creation (${param} templates)
-├── hot-reload.ts      Config file watcher (chokidar, zero-downtime diffs)
-├── recovery.ts        Health tracker with exponential backoff
-└── spawn-lock.ts      Async mutex — prevents concurrent spawns of same server
+Step 1: search_tools({"query": "github repository"})
+        → ["github__search_repositories", "github__list_issues", ...]
+
+Step 2: describe_tool({"tool": "github__search_repositories"})
+        → full schema, parameters, examples
+
+Step 3: execute_tool({"tool": "github__search_repositories",
+                       "args": {"query": "ml stars:>1000"}})
+        → tool execution results
 ```
+
+This **Discover → Describe → Execute** flow is how agents naturally reason about
+tools. The gateway makes this explicit and frictionless.
 
 ## REST API
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/health` | GET | Gateway status, server counts, uptime |
-| `/api/servers` | GET | All servers with status (running/stopped/unhealthy/disabled) |
-| `/api/servers/:name` | GET | Server details, process info, health diagnostics |
+| `/api/servers` | GET | All servers with status |
+| `/api/servers/:name` | GET | Server details, process info, diagnostics |
 | `/api/servers/:name/start` | POST | Start a stopped server |
 | `/api/servers/:name/stop` | POST | Stop a running server |
 | `/api/servers/:name/restart` | POST | Restart (kill + spawn) |
@@ -254,19 +316,16 @@ src/
 | `/api/tools?q=` | GET | Search cached tools |
 | `/api/events` | GET | SSE stream for gateway events |
 
-## Tests
+## Troubleshooting
 
-```bash
-bun test                      # 156 tests across 15 files
-bun test --watch              # Watch mode
-bun test --coverage           # Coverage report
-```
-
-Tests run automatically on every push via GitHub Actions (Bun v1.0, v1.1, v1.2).
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for release history.
+| Problem | Solution |
+|---------|----------|
+| Config file not found | The gateway auto-creates a default config. Edit it to add your servers, then restart. |
+| Tool not found | Use `search_tools` to find the exact namespaced name (`server__tool` format) |
+| Server unhealthy | Wait 30s for auto-retry, or use `manage_server` to restart it |
+| Unauthorized | Check that your `MCP_GATEWAY_TOKEN` matches, or set `MCP_GATEWAY_NO_AUTH=true` |
+| Port already in use | Set `PORT=8001` (or any free port) |
+| Server won't start | Check the command exists: `which npx` or `which docker` |
 
 ## Contributing
 
@@ -276,3 +335,12 @@ structure, and pull request guidelines. All contributions are welcome.
 ## License
 
 MIT — see the [LICENSE](LICENSE) file.
+
+---
+
+<p align="center">
+  <b>One endpoint. Every tool. Zero friction.</b><br>
+  <a href="https://www.npmjs.com/package/one-mcp">npm</a> ·
+  <a href="https://github.com/samanvaya5/one-mcp">GitHub</a> ·
+  <a href="https://github.com/samanvaya5/one-mcp/issues">Issues</a>
+</p>
