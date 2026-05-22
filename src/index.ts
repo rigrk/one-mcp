@@ -1,3 +1,5 @@
+#!/usr/bin/env bun
+
 import { loadConfig } from "./config.js";
 import { createGatewayServer, createStdioGatewayServer } from "./mcp-server.js";
 import { LifecycleManager } from "./lifecycle.js";
@@ -12,16 +14,35 @@ import type { GatewayConfig, ServerConfig } from "./types.js";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-const configPath =
+function expandPath(p: string): string {
+  if (p.startsWith("~/")) return join(homedir(), p.slice(2));
+  return p;
+}
+
+const configPath = expandPath(
   process.env.MCP_GATEWAY_CONFIG ||
-  join(homedir(), ".config", "one-mcp", "config.json");
+    join(homedir(), ".config", "one-mcp", "config.json"),
+);
 
 const watch = process.argv.includes("--watch");
 const refreshRegistry = process.argv.includes("--refresh-registry");
 const stdioMode = process.argv.includes("--stdio");
 
 async function main(): Promise<void> {
-  const config: GatewayConfig = loadConfig(configPath);
+  let config: GatewayConfig;
+  try {
+    config = loadConfig(configPath);
+  } catch (err) {
+    const error = err as NodeJS.ErrnoException;
+    if (error.code === "ENOENT") {
+      console.error(`Config file not found: ${configPath}`);
+      console.error(
+        "A default config has been created. Edit it to add your MCP servers, then restart.",
+      );
+      process.exit(1);
+    }
+    throw err;
+  }
 
   const spawnLock = new SpawnLock();
   const lifecycle = new LifecycleManager();
@@ -113,6 +134,8 @@ async function main(): Promise<void> {
       });
     }
 
+    // Grace period to let in-flight requests finish before exiting
+    await new Promise((r) => setTimeout(r, 500));
     process.exit(0);
   };
 
