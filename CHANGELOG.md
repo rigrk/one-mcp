@@ -7,13 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] — 2026-05-22
+
+### Fixed
+- **Critical: Idle timer was not killing on-demand servers** — `ensureIdleCheckInterval()`
+  had an empty loop body and never called `killIfIdle()`. Now properly iterates through
+  all on-demand servers and kills idle ones. Added `idleTimeout` to `ServerEntry` so the
+  interval callback has access to timeout values without the original config.
+- **Version mismatch** — `mcp-server.ts` hardcoded version "1.0.0" while `package.json`
+  declared "1.1.0". Now dynamically imports version from `package.json`.
+- **Graceful shutdown** — Added a 500ms grace period before `process.exit(0)` to allow
+  in-flight requests to complete. Previously, active requests could be abruptly terminated.
+
 ### Added
-- GitHub Actions CI pipeline: `bun test` across Bun v1.0–1.2, TypeScript type checking,
-  and automated npm publishing on version tags
-- CHANGELOG.md following Keep a Changelog format
-- CONTRIBUTING.md with development workflow and pull request guidelines
-- Issue templates (bug report + feature request) and pull request template
-- Badges for CI status, npm version, and license in README
+- **Auto-create default config on first run** — If the config file doesn't exist,
+  `loadConfig()` now creates a default config with sensible defaults (port 8000,
+  host 127.0.0.1, empty servers array, helpful comment pointing to docs) instead of
+  crashing with a confusing error.
+- **Default paths for `registryPath` and `logPath`** — When not specified in config,
+  these now default to `~/.config/one-mcp/tool-registry.json` and
+  `~/.config/one-mcp/gateway.log` respectively, instead of failing validation.
+- **`MCP_GATEWAY_TOKEN` environment variable support** — The config loader now reads
+  the auth token from this env var, matching the documented behavior.
+- **Path expansion (`~` → home directory)** — Config path, `registryPath`, and `logPath`
+  now support `~` shorthand for the user's home directory.
+- **Shebang for CLI execution** — Added `#!/usr/bin/env bun` to `src/index.ts` for
+  direct executable support.
+
+### Changed
+- **Package overhaul for production readiness**:
+  - `bin` entry now points to `./dist/index.js` (compiled output)
+  - Added `build` script: `bun build --target=bun --outdir=dist src/index.ts`
+  - Added `prepublishOnly` script for auto-build on publish
+  - Added `exports` field for programmatic usage
+  - Expanded `engines` to support Node.js ≥18 in addition to Bun ≥1.0
+  - Expanded `keywords` from 5 to 13 for better discoverability
+  - Added `preferGlobal: true` to indicate CLI tool nature
+- **Complete README rewrite** — World-class documentation with:
+  - Hero section with badges and one-line install
+  - "Agent Quick Install" section for Claude, Cursor, Grok, and generic SSE
+  - Before/After comparison table
+  - Architecture diagram
+  - Complete 12-tool reference table
+  - 3-step workflow with examples
+  - Troubleshooting guide
 
 ## [1.1.0] — 2026-05-20
 
