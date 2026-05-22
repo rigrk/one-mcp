@@ -1,5 +1,9 @@
 import { describe, test, expect, beforeAll, afterAll } from "bun:test";
 import type { Server } from "node:http";
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
+const pkg = require("../package.json");
 
 let serverUrl = "";
 let httpServer: Server | null = null;
@@ -109,7 +113,7 @@ describe("MCP Server", () => {
     });
     const body = await res.json();
     expect(body.result.serverInfo.name).toBe("one-mcp");
-    expect(body.result.serverInfo.version).toBe("1.0.0");
+    expect(body.result.serverInfo.version).toBe(pkg.version);
   });
 
   test("server gracefully shuts down on SIGTERM", async () => {
